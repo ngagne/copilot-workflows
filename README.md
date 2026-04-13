@@ -1,4 +1,4 @@
-# AI Workflows
+# Copilot Workflows
 
 A Next.js web application for running AI-powered workflows backed by GitHub Copilot. Users sign in with GitHub, browse a catalog of workflows, and execute them with a prompt and optional code file uploads.
 

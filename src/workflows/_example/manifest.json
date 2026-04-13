@@ -1,0 +1,9 @@
+{
+  "id": "_example",
+  "name": "Echo Workflow",
+  "description": "A simple reference workflow that sends your prompt to Copilot and returns the response. Use this as a template for building new workflows.",
+  "version": "1.0.0",
+  "acceptsFiles": false,
+  "promptPlaceholder": "Ask me anything...",
+  "tags": ["example", "reference"]
+}

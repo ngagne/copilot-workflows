@@ -1,0 +1,94 @@
+.runner {
+  width: 100%;
+  max-width: 800px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.textarea {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-white);
+  transition: border-color 0.15s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(20, 86, 240, 0.1);
+}
+
+.textarea:disabled {
+  background: var(--bg-light);
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.btnPrimary {
+  background: var(--bg-dark);
+  color: #ffffff;
+  padding: 11px 20px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnWithSpinner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spinner {
+  display: inline-block;
+  animation: pulse 1.4s ease-in-out infinite;
+  font-size: 16px;
+  line-height: 1;
+}
+
+@keyframes pulse {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}

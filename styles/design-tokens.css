@@ -1,0 +1,53 @@
+:root {
+  /* Brand */
+  --brand-blue: #1456f0;
+  --brand-blue-hover: #2563eb;
+  --brand-blue-active: #1d4ed8;
+  --brand-pink: #ea5ec1;
+
+  /* Text */
+  --text-primary: #222222;
+  --text-secondary: #45515e;
+  --text-muted: #8e8e93;
+  --text-dark: #18181b;
+
+  /* Backgrounds */
+  --bg-white: #ffffff;
+  --bg-light: #f0f0f0;
+  --bg-dark: #181e25;
+  --bg-error: #fef2f2;
+
+  /* Borders */
+  --border-light: #f2f3f5;
+  --border-default: #e5e7eb;
+
+  /* Shadows */
+  --shadow-card: rgba(0, 0, 0, 0.08) 0px 4px 6px;
+  --shadow-brand: rgba(44, 30, 116, 0.16) 0px 0px 15px;
+  --shadow-elevated: rgba(36, 36, 36, 0.08) 0px 12px 16px -4px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-pill: 9999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+  --space-8: 64px;
+  --space-9: 80px;
+
+  /* Typography */
+  --font-ui: 'DM Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-display: 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mid: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}

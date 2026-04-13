@@ -1,0 +1,11 @@
+{
+  "id": "code-review",
+  "name": "Code Review",
+  "description": "Submit code files and a prompt. Copilot reviews for bugs, style issues, and improvements.",
+  "version": "1.0.0",
+  "acceptsFiles": true,
+  "maxFiles": 10,
+  "allowedFileTypes": [".ts", ".js", ".py", ".go", ".java", ".md"],
+  "promptPlaceholder": "What should I focus on in this review?",
+  "tags": ["code", "review"]
+}

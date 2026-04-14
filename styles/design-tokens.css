@@ -51,3 +51,26 @@
   --font-display: 'Outfit', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mid: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+
+:root.dark {
+  /* Text */
+  --text-primary: #e5e7eb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --text-dark: #f9fafb;
+
+  /* Backgrounds */
+  --bg-white: #111827;
+  --bg-light: #1f2937;
+  --bg-dark: #030712;
+  --bg-error: #450a0a;
+
+  /* Borders */
+  --border-light: #374151;
+  --border-default: #4b5563;
+
+  /* Shadows */
+  --shadow-card: rgba(0, 0, 0, 0.3) 0px 4px 6px;
+  --shadow-brand: rgba(44, 30, 116, 0.3) 0px 0px 15px;
+  --shadow-elevated: rgba(0, 0, 0, 0.3) 0px 12px 16px -4px;
+}

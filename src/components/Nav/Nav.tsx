@@ -2,6 +2,7 @@
 
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
+import ThemeToggle from '@/src/components/ThemeToggle/ThemeToggle';
 import styles from './Nav.module.css';
 
 interface NavProps {
@@ -17,6 +18,7 @@ export default function Nav({ userName, userEmail, userImage }: NavProps) {
         AI Workflows
       </Link>
       <div className={styles.userSection}>
+        <ThemeToggle />
         <div className={styles.userInfo}>
           {userImage && (
             <img src={userImage} alt={userName ?? 'User'} className={styles.avatar} />

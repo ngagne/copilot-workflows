@@ -1,0 +1,21 @@
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:root.dark .toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

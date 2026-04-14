@@ -51,9 +51,19 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
   const [events, setEvents] = useState<WorkflowEvent[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [promptHistory, setPromptHistory] = useState<string[]>(() => getPromptHistory(workflowId));
+  // Start with empty history for SSR/client consistency, load from localStorage on mount
+  const [promptHistory, setPromptHistory] = useState<string[]>([]);
   const historyRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const initialized = useRef(false);
+
+  // Load history from storage on mount (client only)
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      setPromptHistory(getPromptHistory(workflowId));
+    }
+  }, [workflowId]);
 
   // Close history dropdown when clicking outside
   useEffect(() => {
@@ -67,11 +77,6 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showHistory]);
-
-  // Refresh history from storage when workflowId changes
-  useEffect(() => {
-    setPromptHistory(getPromptHistory(workflowId));
-  }, [workflowId]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {

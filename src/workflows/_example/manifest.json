@@ -5,5 +5,6 @@
   "version": "1.0.0",
   "acceptsFiles": false,
   "promptPlaceholder": "Ask me anything...",
-  "tags": ["example", "reference"]
+  "tags": ["example", "reference"],
+  "model": "claude-sonnet-4-20250514"
 }

@@ -8,6 +8,7 @@ export interface WorkflowManifest {
   allowedFileTypes?: string[];
   promptPlaceholder?: string;
   tags?: string[];
+  model?: string;
 }
 
 export interface WorkflowFile {

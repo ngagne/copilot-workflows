@@ -3,6 +3,7 @@ import { redirect, notFound } from 'next/navigation';
 import { getWorkflow } from '@/src/workflows/loader';
 import Nav from '@/src/components/Nav/Nav';
 import WorkflowRunner from '@/src/components/WorkflowRunner/WorkflowRunner';
+import Chip from '@/src/components/Chip/Chip';
 import Link from 'next/link';
 import styles from './workflow.module.css';
 
@@ -36,7 +37,12 @@ export default async function WorkflowPage({ params }: WorkflowPageProps) {
           <span className={styles.breadcrumbSep}>/</span>
           <span className={styles.breadcrumbCurrent}>{workflow.manifest.name}</span>
         </nav>
-        <h1 className={styles.title}>{workflow.manifest.name}</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>{workflow.manifest.name}</h1>
+          {workflow.manifest.model && (
+            <Chip label={workflow.manifest.model} variant="brand" />
+          )}
+        </div>
         <p className={styles.description}>{workflow.manifest.description}</p>
         <WorkflowRunner manifest={workflow.manifest} workflowId={workflow.manifest.id} />
       </div>

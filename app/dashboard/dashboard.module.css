@@ -21,7 +21,7 @@
   font-family: var(--font-ui);
   font-size: 16px;
   font-weight: 400;
-  color: #45515e;
+  color: var(--text-secondary);
   margin-bottom: var(--space-6);
 }
 

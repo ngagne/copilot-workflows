@@ -13,7 +13,7 @@
   font-size: 80px;
   font-weight: 500;
   line-height: 1.10;
-  color: #222222;
+  color: var(--text-dark);
   margin-bottom: var(--space-3);
 }
 
@@ -21,7 +21,7 @@
   font-family: var(--font-ui);
   font-size: 20px;
   font-weight: 500;
-  color: #45515e;
+  color: var(--text-secondary);
   margin-bottom: var(--space-8);
 }
 

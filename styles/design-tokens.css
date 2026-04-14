@@ -13,6 +13,7 @@
 
   /* Backgrounds */
   --bg-white: #ffffff;
+  --bg-surface: #ffffff;
   --bg-light: #f0f0f0;
   --bg-dark: #181e25;
   --bg-error: #fef2f2;
@@ -53,6 +54,12 @@
 }
 
 :root.dark {
+  /* Brand */
+  --brand-blue: #3b82f6;
+  --brand-blue-hover: #60a5fa;
+  --brand-blue-active: #2563eb;
+  --brand-pink: #ea5ec1;
+
   /* Text */
   --text-primary: #e5e7eb;
   --text-secondary: #9ca3af;
@@ -60,17 +67,18 @@
   --text-dark: #f9fafb;
 
   /* Backgrounds */
-  --bg-white: #111827;
-  --bg-light: #1f2937;
+  --bg-white: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-light: #334155;
   --bg-dark: #030712;
   --bg-error: #450a0a;
 
   /* Borders */
-  --border-light: #374151;
-  --border-default: #4b5563;
+  --border-light: #334155;
+  --border-default: #475569;
 
   /* Shadows */
-  --shadow-card: rgba(0, 0, 0, 0.3) 0px 4px 6px;
+  --shadow-card: rgba(0, 0, 0, 0.4) 0px 4px 6px;
   --shadow-brand: rgba(44, 30, 116, 0.3) 0px 0px 15px;
-  --shadow-elevated: rgba(0, 0, 0, 0.3) 0px 12px 16px -4px;
+  --shadow-elevated: rgba(0, 0, 0, 0.4) 0px 12px 16px -4px;
 }

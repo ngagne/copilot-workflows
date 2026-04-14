@@ -103,6 +103,7 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
       if (!prompt.trim() || isRunning) return;
 
       const userPrompt = prompt.trim();
+      const isFirstPrompt = turns.length === 0;
       setIsRunning(true);
       setIsStreaming(true);
       setCurrentEvents([]);
@@ -191,8 +192,11 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
                 : t
             )
           );
-          savePrompt(workflowId, userPrompt);
-          setPromptHistory(getPromptHistory(workflowId));
+          // Only save prompt to history if it's the first prompt of a conversation
+          if (isFirstPrompt) {
+            savePrompt(workflowId, userPrompt);
+            setPromptHistory(getPromptHistory(workflowId));
+          }
         },
         onError: (message) => {
           const errorEvent: WorkflowEvent = {
@@ -278,10 +282,10 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
 
   return (
     <div className={styles.runner}>
-      {/* Chat header with new chat button */}
-      <div className={styles.chatHeader}>
-        <span className={styles.chatTitle}>Chat</span>
-        {hasAnyContent && (
+      {/* Chat header with new chat button - only shown after first prompt */}
+      {hasAnyContent && (
+        <div className={styles.chatHeader}>
+          <span className={styles.chatTitle}>Chat</span>
           <button
             type="button"
             className={styles.newChatBtn}
@@ -293,11 +297,12 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
             </svg>
             New Chat
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Chat messages area */}
-      <div className={styles.chatArea}>
+      {/* Chat messages area - only shown after first prompt */}
+      {hasAnyContent && (
+        <div className={styles.chatArea}>
         {turns.map((turn) => (
           <div key={turn.id} className={styles.turnContainer}>
             {/* User message - right aligned */}
@@ -341,7 +346,8 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
         ))}
 
         <div ref={chatEndRef} />
-      </div>
+        </div>
+      )}
 
       {/* Input form */}
       <form onSubmit={handleSubmit} className={styles.form}>

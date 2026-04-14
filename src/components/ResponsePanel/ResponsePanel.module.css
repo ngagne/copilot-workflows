@@ -3,7 +3,7 @@
   margin-top: var(--space-5);
 }
 
-.statusBar {
+.activityIndicator {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -16,25 +16,22 @@
   color: var(--text-secondary);
 }
 
-.statusMessage {
+.activitySpinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--brand-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.activityText {
   font-weight: 500;
-}
-
-.progressMessage {
-  color: var(--brand-blue);
-}
-
-.spinner {
-  display: inline-block;
-  animation: pulse 1.4s ease-in-out infinite;
-  font-size: 20px;
-  line-height: 1;
-  color: var(--text-muted);
-}
-
-@keyframes pulse {
-  0%, 80%, 100% { opacity: 0.3; }
-  40% { opacity: 1; }
 }
 
 .errorCard {
@@ -121,6 +118,52 @@
   padding-left: var(--space-4);
   color: var(--text-secondary);
   margin-bottom: var(--space-3);
+}
+
+.resultArea :global(a) {
+  color: var(--brand-blue);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.resultArea :global(a:hover) {
+  color: var(--brand-blue-hover);
+}
+
+.copyRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.copyBtn:hover {
+  background: var(--bg-light);
+  color: var(--text-primary);
+}
+
+.copyBtn:active {
+  background: var(--border-light);
+}
+
+.copyIcon {
+  flex-shrink: 0;
 }
 
 .actions {

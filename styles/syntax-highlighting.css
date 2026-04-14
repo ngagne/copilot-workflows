@@ -1,0 +1,107 @@
+/* Syntax highlighting theme for code blocks */
+/* Based on GitHub Dark Dimmed theme */
+
+/* Code blocks with syntax highlighting */
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 16px;
+  color: #adbac7;
+  background: #22272e;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  border-radius: 8px;
+}
+
+/* Language badge */
+.hljs::before {
+  content: attr(data-language);
+  display: block;
+  padding: 0 0 8px;
+  margin-bottom: 8px;
+  color: #768390;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #373e47;
+}
+
+/* Syntax highlighting tokens */
+.hljs-comment,
+.hljs-quote {
+  color: #768390;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-addition,
+.hljs-meta {
+  color: #f47067;
+}
+
+.hljs-number,
+.hljs-doctag,
+.hljs-literal {
+  color: #6cb6ff;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-symbol {
+  color: #96d0ff;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-name {
+  color: #dcbdfb;
+}
+
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-selector-attr {
+  color: #6cb6ff;
+}
+
+.hljs-property,
+.hljs-diff,
+.hljs-bullet {
+  color: #e09b75;
+}
+
+.hljs-type,
+.hljs-built_in,
+.hljs-class {
+  color: #f69d50;
+}
+
+.hljs-params {
+  color: #adbac7;
+}
+
+.hljs-function,
+.hljs-function .hljs-keyword {
+  color: #dcbdfb;
+}
+
+.hljs-deletion {
+  color: #f47067;
+}
+
+.hljs-link {
+  color: #539bf5;
+  text-decoration: underline;
+}
+
+/* Inline code (not in pre blocks) */
+:not(pre) > code {
+  background: rgba(173, 186, 199, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-size: 13px;
+  color: #adbac7;
+}

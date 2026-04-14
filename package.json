@@ -8,13 +8,14 @@
     "postbuild": "node scripts/copy-skills.js",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "test:e2e": "playwright test"
   },
   "dependencies": {
     "@github/copilot-sdk": "^0.2.2",
+    "highlight.js": "^11.11.1",
     "marked": "^18.0.0",
     "next": "16.2.3",
     "next-auth": "5.0.0-beta.30",
@@ -23,16 +24,18 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@types/highlight.js": "^9.12.4",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^6.0.1",
-    "@vitest/coverage-v8": "^4.1.4",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "jest": "^30.3.0",
     "jsdom": "^29.0.2",
     "playwright": "^1.59.1",
-    "typescript": "^6.0.2",
-    "vitest": "^4.1.4"
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
   }
 }

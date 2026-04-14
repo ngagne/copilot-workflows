@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { marked } from 'marked';
+import { parseMarkdown } from '@/src/lib/markdown';
 import type { WorkflowManifest, WorkflowEvent, WorkflowInput, WorkflowResult } from '@/src/workflows/types';
 import FileDropzone from '@/src/components/FileDropzone/FileDropzone';
 import { runWorkflow } from '@/src/lib/runWorkflow';
@@ -291,7 +291,7 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
   };
 
   const renderMarkdown = (content: string) => {
-    const html = marked.parse(content) as string;
+    const html = parseMarkdown(content);
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
@@ -303,7 +303,7 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
 
   const getRenderedHtml = (turn: ChatTurn): string => {
     const md = getMarkdownContent(turn);
-    return marked.parse(md) as string;
+    return parseMarkdown(md);
   };
 
   const triggerDownload = (blob: Blob, filename: string) => {

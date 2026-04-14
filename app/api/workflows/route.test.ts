@@ -1,22 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('@/src/auth', () => ({
-  auth: vi.fn(),
+jest.mock('@/src/auth', () => ({
+  auth: jest.fn(),
 }));
 
-vi.mock('@/src/workflows/loader', () => ({
-  getWorkflows: vi.fn(),
+jest.mock('@/src/workflows/loader', () => ({
+  getWorkflows: jest.fn(),
 }));
 
 describe('GET /api/workflows', () => {
   beforeEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
+    jest.resetModules();
+    jest.clearAllMocks();
   });
 
   it('should return 401 when unauthenticated', async () => {
     const { auth } = await import('@/src/auth');
-    vi.mocked(auth).mockResolvedValue(null);
+    (auth as jest.Mock).mockResolvedValue(null);
 
     const { GET } = await import('@/app/api/workflows/route');
     const response = await GET();
@@ -28,7 +26,7 @@ describe('GET /api/workflows', () => {
 
   it('should return 200 with workflow manifests when authenticated', async () => {
     const { auth } = await import('@/src/auth');
-    vi.mocked(auth).mockResolvedValue({
+    (auth as jest.Mock).mockResolvedValue({
       user: { email: 'test@example.com' },
       githubAccessToken: 'token',
     });
@@ -43,7 +41,7 @@ describe('GET /api/workflows', () => {
         acceptsFiles: false,
       },
     ];
-    vi.mocked(getWorkflows).mockReturnValue(mockWorkflows as any);
+    (getWorkflows as jest.Mock).mockReturnValue(mockWorkflows);
 
     const { GET } = await import('@/app/api/workflows/route');
     const response = await GET();

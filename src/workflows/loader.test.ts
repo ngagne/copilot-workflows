@@ -1,4 +1,3 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -34,11 +33,11 @@ describe('Workflow Loader', () => {
   const originalDir = join(process.cwd(), 'src', 'workflows');
 
   beforeEach(() => {
-    vi.resetModules();
+    jest.resetModules();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    jest.restoreAllMocks();
     _setWorkflowsDir(originalDir);
   });
 
@@ -56,7 +55,7 @@ describe('Workflow Loader', () => {
     });
 
     it('should return false for manifest missing required fields', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       const partial = { id: 'test', description: 'x', version: '1.0.0', acceptsFiles: false };
       expect(validateManifest(partial, 'test')).toBe(false);
@@ -66,7 +65,7 @@ describe('Workflow Loader', () => {
     });
 
     it('should return false when manifest id does not match folder name', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       const bad = { id: 'wrong', name: 'X', description: 'x', version: '1.0.0', acceptsFiles: false };
       expect(validateManifest(bad, 'test')).toBe(false);
@@ -102,13 +101,48 @@ describe('Workflow Loader', () => {
     });
 
     it('should reject manifest with null required field values', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       const bad = { id: null, name: 'X', description: 'x', version: '1.0.0', acceptsFiles: false };
       expect(validateManifest(bad, 'x')).toBe(false);
       expect(warnSpy).toHaveBeenCalledWith(
         expect.stringContaining('missing required field "id"'),
       );
+    });
+
+    it('should reject manifest with non-string id', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const bad = { id: 123, name: 'X', description: 'x', version: '1.0.0', acceptsFiles: false };
+      expect(validateManifest(bad, 'x')).toBe(false);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('does not match folder name'),
+      );
+    });
+
+    it('should validate each required field individually', () => {
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+      const requiredFields = ['id', 'name', 'description', 'version', 'acceptsFiles'];
+
+      for (const field of requiredFields) {
+        warnSpy.mockClear();
+
+        // Create a manifest missing one field
+        const manifest: Record<string, unknown> = {
+          id: 'test',
+          name: 'Test',
+          description: 'Test',
+          version: '1.0.0',
+          acceptsFiles: false,
+        };
+        delete manifest[field];
+
+        expect(validateManifest(manifest, 'test')).toBe(false);
+        expect(warnSpy).toHaveBeenCalledWith(
+          expect.stringContaining(`missing required field "${field}"`),
+        );
+      }
     });
   });
 
@@ -175,6 +209,40 @@ describe('Workflow Loader', () => {
 
       rmSync(dir, { recursive: true, force: true });
     });
+
+    it('should return empty when skills path is a file not a directory', () => {
+      const dir = join(tmpdir(), `test-wf-skills-file-${Date.now()}`);
+      const workflowPath = join(dir, 'my-workflow');
+      mkdirSync(workflowPath, { recursive: true });
+
+      // Create a file named 'skills' instead of a directory
+      writeFileSync(join(workflowPath, 'skills'), 'not a directory');
+
+      const skills = discoverSkills(workflowPath);
+      expect(skills).toEqual([]);
+
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('should handle skill directories that are actually files (edge case)', () => {
+      const dir = join(tmpdir(), `test-wf-skills-edge-${Date.now()}`);
+      const workflowPath = join(dir, 'my-workflow');
+      mkdirSync(workflowPath, { recursive: true });
+
+      // Create skills directory with a proper skill subdirectory
+      const skillsPath = join(workflowPath, 'skills');
+      mkdirSync(skillsPath, { recursive: true });
+
+      // Create a proper skill subdirectory with SKILL.md
+      const skillSubPath = join(skillsPath, 'test-skill');
+      mkdirSync(skillSubPath, { recursive: true });
+      writeFileSync(join(skillSubPath, 'SKILL.md'), '# Test Skill');
+
+      const skills = discoverSkills(workflowPath);
+      expect(skills).toHaveLength(1);
+
+      rmSync(dir, { recursive: true, force: true });
+    });
   });
 
   describe('loadWorkflow error paths', () => {
@@ -229,7 +297,7 @@ describe('Workflow Loader', () => {
 
   describe('scanWorkflows error paths', () => {
     it('should handle scandir failure gracefully', async () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const fakeDir = join(tmpdir(), `does-not-exist-${Date.now()}`);
       _setWorkflowsDir(fakeDir);
 
@@ -283,6 +351,19 @@ describe('Workflow Loader', () => {
       const count2 = getWorkflows().length;
 
       expect(count2).toBe(count1);
+    });
+
+    it('should return empty array when cache is empty', async () => {
+      const fakeDir = join(tmpdir(), `test-empty-cache-${Date.now()}`);
+      mkdirSync(fakeDir, { recursive: true });
+      _setWorkflowsDir(fakeDir);
+
+      await reloadWorkflows();
+      const workflows = getWorkflows();
+
+      expect(workflows).toEqual([]);
+
+      rmSync(fakeDir, { recursive: true, force: true });
     });
   });
 

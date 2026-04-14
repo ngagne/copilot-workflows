@@ -1,16 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { WorkflowContext, WorkflowInput } from '../types.js';
+import workflowFactory from './index';
 
 describe('_example Workflow', () => {
   it('should export a default factory function', async () => {
-    const module = await import('./index.js');
-    expect(typeof module.default).toBe('function');
+    expect(typeof workflowFactory).toBe('function');
   });
 
   it('should emit status, progress, and complete events', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('Hello from Copilot!');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('Hello from Copilot!');
 
     const context: WorkflowContext = {
       workflowId: '_example',
@@ -19,7 +17,7 @@ describe('_example Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const input: WorkflowInput = {
       prompt: 'Say hello',
       files: [],
@@ -42,9 +40,8 @@ describe('_example Workflow', () => {
   });
 
   it('should return a result with a markdown field', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('## Response\n\nSome markdown');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('## Response\n\nSome markdown');
 
     const context: WorkflowContext = {
       workflowId: '_example',
@@ -53,7 +50,7 @@ describe('_example Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const input: WorkflowInput = {
       prompt: 'Test',
       files: [],

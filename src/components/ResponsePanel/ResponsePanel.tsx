@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { marked } from 'marked';
+import { parseMarkdown } from '@/src/lib/markdown';
 import styles from './ResponsePanel.module.css';
 import type { WorkflowEvent, WorkflowResult } from '@/src/workflows/types';
 
@@ -94,7 +94,7 @@ export default function ResponsePanel({
 
   const getRenderedHtml = (): string => {
     const md = getMarkdownContent();
-    return marked.parse(md) as string;
+    return parseMarkdown(md);
   };
 
   const triggerDownload = (blob: Blob, filename: string) => {
@@ -177,7 +177,7 @@ ${bodyHtml}
   };
 
   const renderMarkdown = (content: string) => {
-    const html = marked.parse(content) as string;
+    const html = parseMarkdown(content);
     return <MarkdownHtml html={html} />;
   };
 

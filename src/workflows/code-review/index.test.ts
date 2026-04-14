@@ -1,16 +1,14 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { WorkflowContext, WorkflowInput } from '../types.js';
+import workflowFactory from './index';
 
 describe('Code Review Workflow', () => {
   it('should export a default factory function', async () => {
-    const module = await import('./index.js');
-    expect(typeof module.default).toBe('function');
+    expect(typeof workflowFactory).toBe('function');
   });
 
   it('should emit status, progress, and complete events', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('## Summary\n\nGood code.');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('## Summary\n\nGood code.');
 
     const context: WorkflowContext = {
       workflowId: 'code-review',
@@ -19,7 +17,7 @@ describe('Code Review Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const input: WorkflowInput = {
       prompt: 'Review this code',
       files: [
@@ -43,9 +41,8 @@ describe('Code Review Workflow', () => {
   });
 
   it('should include file contents in the prompt', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('Looks good!');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('Looks good!');
 
     const context: WorkflowContext = {
       workflowId: 'code-review',
@@ -54,7 +51,7 @@ describe('Code Review Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const fileContent = 'const x = 1;';
     const input: WorkflowInput = {
       prompt: 'Check for bugs',
@@ -70,16 +67,15 @@ describe('Code Review Workflow', () => {
 
     await handler.run(input);
 
-    const promptArg = copilotChat.mock.calls[0][0];
+    const promptArg = (copilotChat as jest.Mock).mock.calls[0][0];
     expect(promptArg.messages[1].content).toContain('app.ts');
     expect(promptArg.messages[1].content).toContain(fileContent);
     expect(promptArg.messages[1].content).toContain('Check for bugs');
   });
 
   it('should use a senior code reviewer system prompt', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('OK');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('OK');
 
     const context: WorkflowContext = {
       workflowId: 'code-review',
@@ -88,20 +84,19 @@ describe('Code Review Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const input: WorkflowInput = { prompt: 'Review', files: [] };
 
     await handler.run(input);
 
-    const promptArg = copilotChat.mock.calls[0][0];
+    const promptArg = (copilotChat as jest.Mock).mock.calls[0][0];
     expect(promptArg.messages[0].role).toBe('system');
     expect(promptArg.messages[0].content).toContain('senior code reviewer');
   });
 
   it('should transform response into structured format', async () => {
-    const module = await import('./index.js');
-    const emit = vi.fn();
-    const copilotChat = vi.fn().mockResolvedValue('Some plain feedback');
+    const emit = jest.fn();
+    const copilotChat = jest.fn().mockResolvedValue('Some plain feedback');
 
     const context: WorkflowContext = {
       workflowId: 'code-review',
@@ -110,7 +105,7 @@ describe('Code Review Workflow', () => {
       emit,
     };
 
-    const handler = module.default(context);
+    const handler = workflowFactory(context);
     const input: WorkflowInput = { prompt: 'Review', files: [] };
 
     const result = await handler.run(input);

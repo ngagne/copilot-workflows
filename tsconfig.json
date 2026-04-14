@@ -28,7 +28,7 @@
       ]
     },
     "types": [
-      "vitest/globals"
+      "jest"
     ]
   },
   "include": [

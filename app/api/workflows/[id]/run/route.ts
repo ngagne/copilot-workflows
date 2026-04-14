@@ -74,7 +74,22 @@ export async function POST(
   const input: WorkflowInput = { prompt, files };
 
   // Create Copilot client with user's token
-  const copilot = createCopilotClient(session.githubAccessToken!);
+  const baseCopilot = createCopilotClient(session.githubAccessToken!);
+
+  // Wrap the copilot client to automatically inject skills
+  const copilot = {
+    async chat(options: Parameters<typeof baseCopilot.chat>[0]) {
+      return baseCopilot.chat({
+        ...options,
+        skillDirectories: workflow.skillDirectories.length > 0 
+          ? workflow.skillDirectories 
+          : options.skillDirectories,
+        disabledSkills: workflow.manifest.disabledSkills && workflow.manifest.disabledSkills.length > 0
+          ? workflow.manifest.disabledSkills
+          : options.disabledSkills,
+      });
+    },
+  };
 
   // Create SSE stream
   const stream = new ReadableStream({

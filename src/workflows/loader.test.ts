@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync, readdirSync } from 'fs';
+import { mkdirSync, rmSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import {
@@ -8,6 +8,7 @@ import {
   getWorkflow,
   reloadWorkflows,
   _setWorkflowsDir,
+  discoverSkills,
 } from '@/src/workflows/loader';
 
 /**
@@ -112,6 +113,69 @@ describe('Workflow Loader', () => {
   });
 
   // ---- Error path tests via temp directories ----
+
+  describe('discoverSkills', () => {
+    it('should return empty array when no skills directory exists', () => {
+      const dir = join(tmpdir(), `test-wf-no-skills-${Date.now()}`);
+      mkdirSync(dir, { recursive: true });
+      mkdirSync(join(dir, 'my-workflow'));
+      writeFileSync(join(dir, 'my-workflow', 'manifest.json'), JSON.stringify({
+        id: 'my-workflow',
+        name: 'Test',
+        description: 'Test',
+        version: '1.0.0',
+        acceptsFiles: false,
+      }));
+
+      const skills = discoverSkills(join(dir, 'my-workflow'));
+      expect(skills).toEqual([]);
+
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('should discover skills with SKILL.md files', () => {
+      const dir = join(tmpdir(), `test-wf-skills-${Date.now()}`);
+      const workflowPath = join(dir, 'my-workflow');
+      mkdirSync(workflowPath, { recursive: true });
+
+      // Create skill 1
+      const skill1Path = join(workflowPath, 'skills', 'security-review');
+      mkdirSync(skill1Path, { recursive: true });
+      writeFileSync(join(skill1Path, 'SKILL.md'), '# Security Review');
+
+      // Create skill 2
+      const skill2Path = join(workflowPath, 'skills', 'performance-review');
+      mkdirSync(skill2Path, { recursive: true });
+      writeFileSync(join(skill2Path, 'SKILL.md'), '# Performance Review');
+
+      // Create directory without SKILL.md (should be skipped)
+      const incompleteSkillPath = join(workflowPath, 'skills', 'incomplete');
+      mkdirSync(incompleteSkillPath, { recursive: true });
+
+      const skills = discoverSkills(workflowPath);
+      expect(skills).toHaveLength(2);
+      expect(skills).toContain(join(skill1Path));
+      expect(skills).toContain(join(skill2Path));
+
+      rmSync(dir, { recursive: true, force: true });
+    });
+
+    it('should handle skills directory with missing SKILL.md gracefully', () => {
+      const dir = join(tmpdir(), `test-wf-bad-skills-${Date.now()}`);
+      const workflowPath = join(dir, 'my-workflow');
+      mkdirSync(workflowPath, { recursive: true });
+
+      // Create a skills directory with only non-SKILL.md files
+      const skillPath = join(workflowPath, 'skills', 'bad-skill');
+      mkdirSync(skillPath, { recursive: true });
+      writeFileSync(join(skillPath, 'README.md'), '# Not a skill');
+
+      const skills = discoverSkills(workflowPath);
+      expect(skills).toEqual([]);
+
+      rmSync(dir, { recursive: true, force: true });
+    });
+  });
 
   describe('loadWorkflow error paths', () => {
     it('should skip workflows with invalid JSON manifest', async () => {

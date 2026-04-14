@@ -9,6 +9,7 @@ export interface WorkflowManifest {
   promptPlaceholder?: string;
   tags?: string[];
   model?: string;
+  disabledSkills?: string[];
 }
 
 export interface WorkflowFile {
@@ -40,6 +41,8 @@ export interface WorkflowEvent {
 export interface CopilotClient {
   chat(options: {
     messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
+    skillDirectories?: string[];
+    disabledSkills?: string[];
   }): Promise<string>;
 }
 
@@ -59,4 +62,5 @@ export type WorkflowFactory = (context: WorkflowContext) => WorkflowHandler;
 export interface LoadedWorkflow {
   manifest: WorkflowManifest;
   factory: WorkflowFactory;
+  skillDirectories: string[];
 }

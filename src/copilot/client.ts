@@ -37,7 +37,7 @@ function getCopilotCliPath(): string {
  */
 export function createCopilotClient(accessToken: string): ICopilotClient {
   return {
-    async chat({ messages }) {
+    async chat({ messages, skillDirectories, disabledSkills }) {
       // Resolve CLI path explicitly to avoid Next.js bundling issues
       const cliPath = getCopilotCliPath();
 
@@ -54,14 +54,24 @@ export function createCopilotClient(accessToken: string): ICopilotClient {
       await client.start();
 
       try {
-        // Create a session with the user's GitHub token
-        const session = await client.createSession({
+        // Create a session with the user's GitHub token and skills
+        const sessionConfig: any = {
           model: 'gpt-4.1',
           onPermissionRequest: approveAll,
           systemMessage: {
             content: '',
           },
-        });
+        };
+
+        if (skillDirectories && skillDirectories.length > 0) {
+          sessionConfig.skillDirectories = skillDirectories;
+        }
+
+        if (disabledSkills && disabledSkills.length > 0) {
+          sessionConfig.disabledSkills = disabledSkills;
+        }
+
+        const session = await client.createSession(sessionConfig);
 
         try {
           // Build the prompt from messages

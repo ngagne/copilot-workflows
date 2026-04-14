@@ -10,10 +10,14 @@ export async function runWorkflow(
     onComplete?: (result: WorkflowResult) => void;
     onError?: (message: string) => void;
     onStreamClose?: () => void;
-  }
+  },
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>
 ): Promise<void> {
   const formData = new FormData();
   formData.append('prompt', input.prompt);
+  if (conversationHistory && conversationHistory.length > 0) {
+    formData.append('conversationHistory', JSON.stringify(conversationHistory));
+  }
   files.forEach((f) => formData.append('files', f));
 
   try {

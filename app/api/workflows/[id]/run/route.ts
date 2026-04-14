@@ -32,6 +32,17 @@ export async function POST(
     return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
   }
 
+  // Parse conversation history
+  const conversationHistoryRaw = formData.get('conversationHistory') as string | null;
+  let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+  if (conversationHistoryRaw) {
+    try {
+      conversationHistory = JSON.parse(conversationHistoryRaw);
+    } catch {
+      // Invalid JSON — ignore
+    }
+  }
+
   // Parse files
   const files: WorkflowFile[] = [];
   const fileEntries = formData.getAll('files');
@@ -76,13 +87,21 @@ export async function POST(
   // Create Copilot client with user's token
   const baseCopilot = createCopilotClient(session.githubAccessToken!);
 
-  // Wrap the copilot client to automatically inject skills
+  // Wrap the copilot client to automatically inject skills and conversation history
   const copilot = {
     async chat(options: Parameters<typeof baseCopilot.chat>[0]) {
+      // Prepend conversation history before the workflow's messages
+      const historyMessages = conversationHistory.map((msg, i) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+      const allMessages = [...historyMessages, ...options.messages];
+
       return baseCopilot.chat({
         ...options,
-        skillDirectories: workflow.skillDirectories.length > 0 
-          ? workflow.skillDirectories 
+        messages: allMessages,
+        skillDirectories: workflow.skillDirectories.length > 0
+          ? workflow.skillDirectories
           : options.skillDirectories,
         disabledSkills: workflow.manifest.disabledSkills && workflow.manifest.disabledSkills.length > 0
           ? workflow.manifest.disabledSkills

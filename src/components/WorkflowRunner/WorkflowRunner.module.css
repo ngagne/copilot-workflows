@@ -1,12 +1,222 @@
 .runner {
   width: 100%;
   max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: var(--space-4);
+}
+
+.chatTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.newChatBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.newChatBtn:hover {
+  background: var(--bg-light);
+  color: var(--text-primary);
+}
+
+.chatArea {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 100px;
+  max-height: 600px;
+}
+
+.turnContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.userMessage {
+  align-self: flex-end;
+  max-width: 75%;
+  background: var(--bg-dark);
+  color: #ffffff;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.userMessage :global(p) {
+  margin: 0;
+}
+
+.userMessage :global(code) {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+}
+
+.userMessage :global(pre) {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin: var(--space-2) 0;
+}
+
+.userMessage :global(pre code) {
+  background: none;
+  padding: 0;
+}
+
+.assistantMessage {
+  align-self: flex-start;
+  max-width: 85%;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.assistantMessage :global(h1),
+.assistantMessage :global(h2),
+.assistantMessage :global(h3) {
+  font-family: var(--font-display);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.assistantMessage :global(h1) { font-size: 18px; font-weight: 600; }
+.assistantMessage :global(h2) { font-size: 16px; font-weight: 600; }
+.assistantMessage :global(h3) { font-size: 14px; font-weight: 600; }
+
+.assistantMessage :global(p) {
+  margin-bottom: var(--space-2);
+}
+
+.assistantMessage :global(ul),
+.assistantMessage :global(ol) {
+  margin-bottom: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.assistantMessage :global(code) {
+  background: var(--bg-light);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+}
+
+.assistantMessage :global(pre) {
+  background: var(--bg-dark);
+  color: #e5e7eb;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin-bottom: var(--space-3);
+}
+
+.assistantMessage :global(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.assistantMessage :global(blockquote) {
+  border-left: 3px solid var(--brand-blue);
+  padding-left: var(--space-3);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.assistantMessage :global(a) {
+  color: var(--brand-blue);
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.activityIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.activitySpinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border-light);
+  border-top-color: var(--brand-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.activityText {
+  font-weight: 500;
+}
+
+.errorCard {
+  background: var(--bg-error);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.errorMessage {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: #dc2626;
+  font-weight: 500;
+  margin: 0;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-light);
 }
 
 .field {
@@ -130,12 +340,12 @@
 
 .textarea {
   font-family: var(--font-ui);
-  font-size: 15px;
+  font-size: 14px;
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   resize: vertical;
-  min-height: 120px;
+  min-height: 80px;
   line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-white);
@@ -161,7 +371,7 @@
 .btnPrimary {
   background: var(--bg-dark);
   color: #ffffff;
-  padding: 11px 20px;
+  padding: 9px 18px;
   border-radius: var(--radius-md);
   border: none;
   font-family: var(--font-ui);

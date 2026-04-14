@@ -22,6 +22,7 @@ export interface WorkflowFile {
 export interface WorkflowInput {
   prompt: string;
   files: WorkflowFile[];
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
 export interface WorkflowResult {

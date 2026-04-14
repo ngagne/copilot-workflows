@@ -66,7 +66,11 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [promptHistory, setPromptHistory] = useState<string[]>([]);
+  const [showDownload, setShowDownload] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
   const historyRef = useRef<HTMLDivElement>(null);
+  const downloadRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
@@ -96,6 +100,19 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showHistory]);
+
+  // Close download dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (downloadRef.current && !downloadRef.current.contains(e.target as Node)) {
+        setShowDownload(null);
+      }
+    }
+    if (showDownload !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showDownload]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -278,6 +295,121 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
+  const getMarkdownContent = (turn: ChatTurn): string => {
+    const completeEvent = turn.events.find((e) => e.type === 'complete');
+    if (!completeEvent) return '';
+    return (completeEvent.payload as { result?: WorkflowResult })?.result?.markdown ?? '';
+  };
+
+  const getRenderedHtml = (turn: ChatTurn): string => {
+    const md = getMarkdownContent(turn);
+    return marked.parse(md) as string;
+  };
+
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setShowDownload(null);
+    setDownloading(null);
+  };
+
+  const downloadMarkdown = (turnId: string) => {
+    setDownloading('md');
+    const turn = turns.find((t) => t.id === turnId);
+    if (!turn) return;
+    const content = getMarkdownContent(turn);
+    const blob = new Blob([content], { type: 'text/markdown' });
+    setTimeout(() => triggerDownload(blob, 'response.md'), 100);
+  };
+
+  const downloadHtml = (turnId: string) => {
+    setDownloading('html');
+    const turn = turns.find((t) => t.id === turnId);
+    if (!turn) return;
+    const bodyHtml = getRenderedHtml(turn);
+    const fullHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workflow Response</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; color: #1f2328; max-width: 800px; margin: 40px auto; padding: 0 24px; }
+  h1, h2, h3, h4, h5, h6 { margin-top: 24px; margin-bottom: 8px; font-weight: 600; }
+  h1 { font-size: 24px; } h2 { font-size: 20px; } h3 { font-size: 18px; }
+  code { background: #f6f8fa; padding: 2px 6px; border-radius: 6px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+  pre { background: #1f2328; color: #e5e7eb; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: inherit; }
+  blockquote { border-left: 3px solid #1456f0; padding-left: 16px; color: #656d76; }
+  a { color: #1456f0; }
+  img { max-width: 100%; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #d0d7de; padding: 8px 12px; }
+  th { background: #f6f8fa; }
+  ul, ol { padding-left: 24px; }
+</style>
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`;
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    setTimeout(() => triggerDownload(blob, 'response.html'), 100);
+  };
+
+  const downloadWord = (turnId: string) => {
+    setDownloading('docx');
+    const turn = turns.find((t) => t.id === turnId);
+    if (!turn) return;
+    const bodyHtml = getRenderedHtml(turn);
+    const wordHtml = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="utf-8">
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.6; }
+  h1 { font-size: 18pt; font-weight: bold; } h2 { font-size: 15pt; font-weight: bold; } h3 { font-size: 13pt; font-weight: bold; }
+  code { font-family: 'Courier New', monospace; background: #f0f0f0; padding: 1px 4px; }
+  pre { background: #f0f0f0; padding: 12px; font-family: 'Courier New', monospace; white-space: pre-wrap; }
+  blockquote { border-left: 3px solid #1456f0; padding-left: 12px; color: #666; }
+  table { border-collapse: collapse; } td, th { border: 1px solid #ccc; padding: 6px; }
+  a { color: #1456f0; }
+</style>
+</head>
+<body>${bodyHtml}</body>
+</html>`.trim();
+    const blob = new Blob([wordHtml], { type: 'application/msword' });
+    setTimeout(() => triggerDownload(blob, 'response.doc'), 100);
+  };
+
+  const handleCopy = async (turnId: string) => {
+    const turn = turns.find((t) => t.id === turnId);
+    if (!turn) return;
+    const content = getMarkdownContent(turn);
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(turnId);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      const textarea = document.createElement('textarea');
+      textarea.value = content;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setCopied(turnId);
+      setTimeout(() => setCopied(null), 2000);
+    }
+  };
+
   const hasAnyContent = turns.length > 0 || currentEvents.length > 0;
 
   return (
@@ -340,6 +472,80 @@ export default function WorkflowRunner({ manifest, workflowId }: WorkflowRunnerP
                       </p>
                     </div>
                   ))}
+                {turn.events.some((e) => e.type === 'complete') && (
+                  <div className={styles.copyRow}>
+                    <button
+                      type="button"
+                      className={styles.copyBtn}
+                      onClick={() => handleCopy(turn.id)}
+                      title={copied === turn.id ? 'Copied!' : 'Copy response'}
+                    >
+                      <svg
+                        className={styles.copyIcon}
+                        viewBox="0 0 16 16"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                      >
+                        <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z" />
+                        <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z" />
+                      </svg>
+                      {copied === turn.id ? 'Copied!' : 'Copy'}
+                    </button>
+                    <div className={styles.downloadWrapper} ref={downloadRef}>
+                      <button
+                        type="button"
+                        className={styles.downloadBtn}
+                        onClick={() => setShowDownload(showDownload === turn.id ? null : turn.id)}
+                        title="Download response"
+                        disabled={downloading !== null}
+                      >
+                        <svg
+                          className={styles.downloadIcon}
+                          viewBox="0 0 16 16"
+                          width="16"
+                          height="16"
+                          fill="currentColor"
+                        >
+                          <path d="M2.75 14A1.75 1.75 0 0 1 1 12.25v-2.5a.75.75 0 0 1 1.5 0v2.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-2.5a.75.75 0 0 1 1.5 0v2.5A1.75 1.75 0 0 1 13.25 14Z" />
+                          <path d="M7.25 7.689l-2.722 2.721a.75.75 0 0 1-1.06-1.06L6.5 6.319V2a.75.75 0 0 1 1.5 0v4.319l3.03 3.03a.75.75 0 1 1-1.06 1.06Z" />
+                        </svg>
+                        Download
+                      </button>
+                      {showDownload === turn.id && (
+                        <div className={styles.downloadDropdown}>
+                          <div className={styles.downloadHeader}>Download as</div>
+                          <ul className={styles.downloadList}>
+                            <li
+                              className={styles.downloadItem}
+                              onClick={() => downloadMarkdown(turn.id)}
+                            >
+                              <span className={styles.formatIcon}>MD</span>
+                              <span className={styles.formatLabel}>Markdown</span>
+                              {downloading === 'md' && <span className={styles.spinner}>⋯</span>}
+                            </li>
+                            <li
+                              className={styles.downloadItem}
+                              onClick={() => downloadHtml(turn.id)}
+                            >
+                              <span className={styles.formatIcon}>HTML</span>
+                              <span className={styles.formatLabel}>HTML (single file)</span>
+                              {downloading === 'html' && <span className={styles.spinner}>⋯</span>}
+                            </li>
+                            <li
+                              className={styles.downloadItem}
+                              onClick={() => downloadWord(turn.id)}
+                            >
+                              <span className={styles.formatIcon}>W</span>
+                              <span className={styles.formatLabel}>Word document</span>
+                              {downloading === 'docx' && <span className={styles.spinner}>⋯</span>}
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

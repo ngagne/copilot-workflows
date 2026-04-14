@@ -8,5 +8,5 @@
   "allowedFileTypes": [".ts", ".js", ".py", ".go", ".java", ".md"],
   "promptPlaceholder": "What should I focus on in this review?",
   "tags": ["code", "review"],
-  "model": "gpt-4o"
+  "model": "claude-sonnet-4-20250514"
 }

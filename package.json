@@ -1,11 +1,10 @@
 {
   "name": "copilot-workflows",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/copy-skills.js",
-    "postbuild": "node scripts/copy-skills.js",
+    "build": "node scripts/generate-workflow-imports.js && next build && node scripts/copy-skills.js",
+    "postbuild": "node scripts/generate-workflow-imports.js && node scripts/copy-skills.js",
     "start": "next start",
     "lint": "eslint",
     "test": "jest --coverage",
@@ -34,7 +33,7 @@
     "jest": "^30.3.0",
     "jsdom": "^29.0.2",
     "playwright": "^1.59.1",
-    "ts-jest": "^29.4.6",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.2"
   }

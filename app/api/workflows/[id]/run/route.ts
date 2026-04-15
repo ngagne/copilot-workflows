@@ -9,6 +9,7 @@ import type {
   WorkflowFile,
 } from '@/src/workflows/types';
 import { NextResponse } from 'next/server';
+import path from 'path';
 
 export async function POST(
   request: Request,
@@ -48,7 +49,24 @@ export async function POST(
   const fileEntries = formData.getAll('files');
 
   const maxFiles = workflow.manifest.maxFiles ?? 5;
-  const allowedFileTypes = workflow.manifest.allowedFileTypes;
+  const allowedFileTypes = workflow.manifest.allowedFileTypes ?? [];
+  const maxFileSize = workflow.manifest.maxFileSize ?? 5 * 1024 * 1024; // 5 MB default
+
+  // Normalize allowed file extensions to dot-prefixed lowercase form
+  const normalizedAllowedFileTypes = Array.isArray(allowedFileTypes)
+    ? allowedFileTypes
+        .map((t) => (typeof t === 'string' ? (t.startsWith('.') ? t.toLowerCase() : `.${t.toLowerCase()}`) : ''))
+        .filter(Boolean)
+    : [];
+
+  function isFileLike(obj: unknown): obj is File {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      typeof (obj as any).arrayBuffer === 'function' &&
+      typeof (obj as any).name === 'string'
+    );
+  }
 
   if (fileEntries.length > maxFiles) {
     return NextResponse.json(
@@ -58,28 +76,39 @@ export async function POST(
   }
 
   for (const fileEntry of fileEntries) {
-    if (fileEntry instanceof File) {
-      // Validate file type
-      if (allowedFileTypes && allowedFileTypes.length > 0) {
-        const ext = '.' + fileEntry.name.split('.').pop()?.toLowerCase();
-        if (!allowedFileTypes.includes(ext)) {
-          return NextResponse.json(
-            { error: `File type ${ext} not allowed. Allowed: ${allowedFileTypes.join(', ')}` },
-            { status: 400 }
-          );
-        }
-      }
-
-      const buffer = await fileEntry.arrayBuffer();
-      const base64 = Buffer.from(buffer).toString('base64');
-
-      files.push({
-        name: fileEntry.name,
-        type: fileEntry.type || 'application/octet-stream',
-        content: base64,
-        size: fileEntry.size,
-      });
+    if (!isFileLike(fileEntry)) {
+      // Skip non-file entries gracefully
+      continue;
     }
+
+    const name = (fileEntry as any).name as string;
+    const sizeProp = (fileEntry as any).size;
+    if (typeof sizeProp === 'number' && sizeProp > maxFileSize) {
+      return NextResponse.json(
+        { error: `File "${name}" exceeds maximum size of ${maxFileSize} bytes` },
+        { status: 400 }
+      );
+    }
+
+    const ext = path.extname(name).toLowerCase();
+    if (normalizedAllowedFileTypes.length > 0 && !normalizedAllowedFileTypes.includes(ext)) {
+      return NextResponse.json(
+        {
+          error: `File type ${ext || '(no extension)'} not allowed. Allowed: ${normalizedAllowedFileTypes.join(', ')}`,
+        },
+        { status: 400 }
+      );
+    }
+
+    const buffer = await (fileEntry as any).arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+
+    files.push({
+      name,
+      type: (fileEntry as any).type || 'application/octet-stream',
+      content: base64,
+      size: typeof sizeProp === 'number' ? sizeProp : Buffer.byteLength(Buffer.from(buffer)),
+    });
   }
 
   const input: WorkflowInput = { prompt, files };

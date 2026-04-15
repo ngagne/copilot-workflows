@@ -5,6 +5,7 @@ export interface WorkflowManifest {
   version: string;
   acceptsFiles: boolean;
   maxFiles?: number;
+  maxFileSize?: number; // maximum file size in bytes (optional)
   allowedFileTypes?: string[];
   promptPlaceholder?: string;
   tags?: string[];

@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync, rmSync } from 'fs';
 import { join, resolve } from 'path';
 import type { WorkflowManifest, LoadedWorkflow, WorkflowFactory } from './types.js';
+import { WORKFLOW_IMPORTS } from './__workflow_imports';
 
 // Source workflows directory (used in development and for module imports)
 const SOURCE_WORKFLOWS_DIR = join(process.cwd(), 'src', 'workflows');
@@ -92,13 +93,8 @@ interface WorkflowModule {
   default: WorkflowFactory;
 }
 
-// Static import map — add new workflows here for Next.js compatibility.
-// Each entry maps a folder name to a dynamic import() call that Next.js
-// can statically analyze.
-const WORKFLOW_IMPORTS: Record<string, () => Promise<WorkflowModule>> = {
-  _example: () => import('./_example/index'),
-  'code-review': () => import('./code-review/index'),
-};
+// Workflow imports are generated at build time into `__workflow_imports.ts`.
+// This keeps a static list of dynamic import() calls that Next.js can analyze.
 
 async function loadWorkflow(folderName: string): Promise<LoadedWorkflow | null> {
   try {
